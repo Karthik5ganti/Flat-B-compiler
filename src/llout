@@ -1,0 +1,42 @@
+; ModuleID = 'B compiler'
+
+@x = common global i32 0
+@y = common global i32 0
+@remainder = common global i32 0
+@gcd = common global i32 0
+@0 = private unnamed_addr constant [11 x i8] c"\22gcd = \22%d\00"
+
+define void @main() {
+entrypoint:
+  store i32 1766, i32* @x
+  store i32 23234, i32* @y
+  %0 = load i32, i32* @x
+  %1 = load i32, i32* @y
+  %modtmp = urem i32 %0, %1
+  store i32 %modtmp, i32* @remainder
+  %2 = load i32, i32* @remainder
+  %notequalcomparetmp = icmp ne i32 %2, 0
+  br i1 %notequalcomparetmp, label %while, label %nextblock
+
+while:                                            ; preds = %while, %entrypoint
+  %3 = load i32, i32* @x
+  %4 = load i32, i32* @y
+  %modtmp1 = urem i32 %3, %4
+  store i32 %modtmp1, i32* @remainder
+  %5 = load i32, i32* @y
+  store i32 %5, i32* @x
+  %6 = load i32, i32* @remainder
+  store i32 %6, i32* @y
+  %7 = load i32, i32* @remainder
+  %notequalcomparetmp2 = icmp ne i32 %7, 0
+  br i1 %notequalcomparetmp2, label %while, label %nextblock
+
+nextblock:                                        ; preds = %while, %entrypoint
+  %8 = load i32, i32* @x
+  store i32 %8, i32* @gcd
+  %9 = load i32, i32* @gcd
+  %10 = call i32 @printf(i8* getelementptr inbounds ([11 x i8], [11 x i8]* @0, i32 0, i32 0), i32 %9)
+  ret void
+}
+
+declare i32 @printf(i8*, i32)
